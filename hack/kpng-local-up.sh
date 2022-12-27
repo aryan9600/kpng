@@ -28,7 +28,8 @@ source "${SCRIPT_DIR}/common.sh"
 : ${SERVICE_ACCOUNT_NAME:=kpng}
 : ${NAMESPACE:=kube-system}
 : ${KPNG_DEBUG_LEVEL:=4}
-: ${BACKEND_ARGS:="['local', '--api=unix:///k8s/proxy.sock', 'to-${BACKEND}', '--v=${KPNG_DEBUG_LEVEL}']"}
+: ${BACKEND_ARGS:="['local', 'to-${BACKEND}', '--v=${KPNG_DEBUG_LEVEL}']"}
+: ${SERVER_ARGS:="['kube','--kubeconfig=/var/lib/kpng/kubeconfig.conf', '--exportMetrics=0.0.0.0:9099', 'to-api']"}
 
 echo -n "this will deploy kpng with docker image $IMAGE, pull policy '$PULL' and the '$BACKEND' backend. Press enter to confirm, C-c to cancel"
 read
@@ -68,7 +69,7 @@ function install_kpng {
     export service_account_name="${SERVICE_ACCOUNT_NAME}" 
     export namespace="${NAMESPACE}" 
     export e2e_backend_args="${BACKEND_ARGS}"
-    export e2e_server_args="['kube','--kubeconfig=/var/lib/kpng/kubeconfig.conf', '--exportMetrics=0.0.0.0:9099', 'to-api']"
+    export e2e_server_args="${SERVER_ARGS}"
 
     go run kpng-ds-yaml-gen.go ./kpng-deployment-ds-template.txt ./kpng-deployment-ds.yaml
     if_error_exit "error generating kpng deployment YAML"
@@ -91,6 +92,6 @@ function install_kpng {
 cd "${0%/*}"
 
 # Comment out build if you just want to install the default, i.e. for quickly getting up and running.
-build_kpng
+# build_kpng
 install_k8s
 install_kpng
