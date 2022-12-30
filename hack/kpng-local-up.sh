@@ -19,9 +19,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source "${SCRIPT_DIR}/utils.sh"
 source "${SCRIPT_DIR}/common.sh"
 
-# build the kpng image...
-: ${KIND:="kindest/node:v1.22.13@sha256:4904eda4d6e64b402169797805b8ec01f50133960ad6c19af45173a27eadf959"}
-: ${IMAGE:="gauravkghildiyal/kpng:latest"}
+: ${IMAGE:="test/kpng:latest"}
 : ${PULL:="IfNotPresent"}
 : ${BACKEND:="nft"}
 : ${CONFIG_MAP_NAME:=kpng}
@@ -34,6 +32,7 @@ source "${SCRIPT_DIR}/common.sh"
 echo -n "this will deploy kpng with docker image $IMAGE, pull policy '$PULL' and the '$BACKEND' backend. Press enter to confirm, C-c to cancel"
 read
 
+# build the kpng image...
 function build_kpng {
     cd ../
 
@@ -53,13 +52,11 @@ function install_k8s {
 
     echo "****************************************************"
     kind delete cluster --name kpng-proxy
-    kind create cluster --config kind.yaml --image $KIND
+    kind create cluster --config tilt/kind.yaml --image "${KINDEST_NODE_IMAGE}":"${K8S_VERSION}"
     echo "****************************************************"
 }
 
 function install_kpng {
-    # substitute it with your changes...
-
     echo "Applying template"
     # Setting vars for generate the kpng deployment based on template
     export kpng_image="${IMAGE}" 
@@ -92,6 +89,6 @@ function install_kpng {
 cd "${0%/*}"
 
 # Comment out build if you just want to install the default, i.e. for quickly getting up and running.
-# build_kpng
+build_kpng
 install_k8s
 install_kpng

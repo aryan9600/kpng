@@ -4,28 +4,9 @@ name: kpng-proxy
 networking:
   kubeProxyMode: "none"
   apiServerAddress: "0.0.0.0"
-  disableDefaultCNI: false
-  podSubnet: 192.168.0.0/16
+  podSubnet: "10.1.0.0/16"
+  serviceSubnet: "10.2.0.0/16"
 nodes:
-  - role: control-plane
-    kubeadmConfigPatches:
-      - |
-        kind: InitConfiguration
-        nodeRegistration:
-          kubeletExtraArgs:
-            node-labels: "kube-proxy=kpng"
-            authorization-mode: "AlwaysAllow"
-  - role: worker
-    kubeadmConfigPatches:
-      - |
-        kind: JoinConfiguration
-        nodeRegistration:
-          kubeletExtraArgs:
-            node-labels: "kube-proxy=kpng"
-  - role: worker
-    kubeadmConfigPatches:
-      - |
-        kind: JoinConfiguration
-        nodeRegistration:
-          kubeletExtraArgs:
-            node-labels: "kube-proxy=kpng"
+- role: control-plane
+- role: worker
+- role: worker
